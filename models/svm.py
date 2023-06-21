@@ -1,8 +1,9 @@
+
 import os
 import cv2
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 import glob
 
@@ -42,30 +43,13 @@ labels = np.array(labels)
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42)
 
-# Create and train the KNN classifier
-knn = KNeighborsClassifier(n_neighbors=5)
-knn.fit(X_train, y_train)
+# Create and train the SVM classifier
+svm = SVC()
+svm.fit(X_train, y_train)
 
 # Make predictions on the test set
-y_pred = knn.predict(X_test)
+y_pred = svm.predict(X_test)
 
 # Calculate the accuracy of the classifier
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
-
-
-# Read and preprocess your own image
-image_path = "E:/KNN - test/1.jpg"  # Replace with the path to your image
-image = cv2.imread(image_path)
-gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-ret, imgf = cv2.threshold(gray_image, 150, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
-
-resized_image = cv2.resize(imgf, (32, 32))
-image_array = np.array(resized_image).flatten()
-
-# Make predictions on your image
-prediction = knn.predict([image_array])
-
-# Print the predicted label
-print("Predicted label:", prediction)
