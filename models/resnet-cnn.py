@@ -20,7 +20,8 @@ filepaths = pd.Series(filepaths, name='Filepath').astype(str)
 labels = pd.Series(labels, name='Label')
 
 images = pd.concat([filepaths, labels], axis=1)
-images.Label.value_counts()
+num_class = images.Label.value_counts().count()
+
 train_df, test_df = train_test_split(images, train_size=0.7, shuffle=True, random_state=1)
 train_generator = tf.keras.preprocessing.image.ImageDataGenerator(
     preprocessing_function=tf.keras.applications.resnet50.preprocess_input,
@@ -71,10 +72,11 @@ pretrained_model = tf.keras.applications.resnet50.ResNet50(
                     pooling='avg')
 
 pretrained_model.trainable = False
+
 inputs = pretrained_model.input
 x = tf.keras.layers.Dense(128, activation='relu')(pretrained_model.output)
 x = tf.keras.layers.Dense(50, activation='relu')(x)
-outputs = tf.keras.layers.Dense(13, activation='softmax')(x)
+outputs = tf.keras.layers.Dense(num_class, activation='softmax')(x)
 model = tf.keras.Model(inputs, outputs)
 print(model.summary())
 model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['accuracy'])
@@ -89,8 +91,6 @@ print('Test accuracy:', score[1])
 
 
 ## prediction 
-
-from tensorflow.keras.preprocessing import image
 
 image_path = 'E:/KNN - test/15/msp1.jpg'  # Replace with the actual image path
 
@@ -112,8 +112,3 @@ reverse_mapping = {v: k for k, v in class_mapping.items()}
 predicted_class_label = reverse_mapping[predicted_label]
 
 print("Predicted class label:", predicted_class_label)
-
-score = model.evaluate(test_images)
-print('Test loss:', score[0])
-print('Test accuracy:', score[1])
-
